@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Security Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: inline-block; margin: 15px; width: 220px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        h1 { color: #2c3e50; font-size: 2.2em; margin-bottom: 10px; }
+        p.subtitle { color: #7f8c8d; margin-bottom: 40px; font-size: 1.1em; }
+        .stat { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+        .label { color: #95a5a6; font-size: 15px; font-weight: 500; }
+        
+        /* צבעים ספציפיים לפי כרטיס */
+        .blue .stat { color: #3498db; }
+        .blue { border-bottom: 5px solid #3498db; }
+        
+        .red .stat { color: #e74c3c; }
+        .red { border-bottom: 5px solid #e74c3c; }
+        
+        .orange .stat { color: #f39c12; }
+        .orange { border-bottom: 5px solid #f39c12; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ GenAI Security Gateway</h1>
+    <p class="subtitle">לוח בקרה ניהולי (Admin Dashboard)</p>
+    
+    <div>
+        <div class="card blue">
+            <div class="stat">{{ stats.total_requests }}</div>
+            <div class="label">בקשות LLM שעובדו</div>
+        </div>
+        <div class="card red">
+            <div class="stat">{{ stats.blocked_injections }}</div>
+            <div class="label">תקיפות (Prompt Injection) נחסמו</div>
+        </div>
+        <div class="card orange">
+            <div class="stat">{{ stats.data_leaks_prevented }}</div>
+            <div class="label">דליפות מידע (DLP) נמנעו</div>
+        </div>
+    </div>
+</body>
+</html>
