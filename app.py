@@ -1,22 +1,22 @@
+#frontend
 from flask import Flask, render_template
-import requests # הוספנו את הספרייה!
+import requests 
 
 app = Flask(__name__)
 
-# זו הכתובת של ה-FastAPI שלך כששניהם רצים על המחשב
 ##FASTAPI_URL = "https://genai-security-api.onrender.com/stats"
-FASTAPI_URL = "http://192.168.7.100:8000/stats"
+##FASTAPI_URL = "http://192.168.7.100:8000/stats"
 ##FASTAPI_URL = "http://host.docker.internal:8000/stats"
+FASTAPI_URL= "http://genai-api:8000/stats"
 
 
 @app.route('/')
 def dashboard():
     try:
-        # כאן קורה הקסם: הפלאסק מבקש את הנתונים מהפאסט-איי-פי-איי
         response = requests.get(FASTAPI_URL)
-        stats = response.json() # ממירים את התשובה למילון פייתון
+        stats = response.json() 
     except:
-        # גיבוי: מה קורה אם ה-FastAPI קרס או לא דלוק?
+
         stats = {
             "total_requests": "שגיאה",
             "blocked_injections": "שגיאה",

@@ -1,0 +1,17 @@
+ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: inline-block; margin: 15px; width: 220px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        h1 { color: #2c3e50; font-size: 2.2em; margin-bottom: 10px; }
+        p.subtitle { color: #7f8c8d; margin-bottom: 40px; font-size: 1.1em; }
+        .stat { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+        .label { color: #95a5a6; font-size: 15px; font-weight: 500; }
+        
+
+        .blue .stat { color: #3498db; }
+        .blue { border-bottom: 5px solid #3498db; }
+        
+        .red .stat { color: #e74c3c; }
+        .red { border-bottom: 5px solid #e74c3c; }
+        
+        .orange .stat { color: #f39c12; }
+        .orange { border-bottom: 5px solid #f39c12; }
