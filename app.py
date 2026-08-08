@@ -7,9 +7,9 @@ app = Flask(__name__)
 #FASTAPI_URL = "https://genai-security-api.onrender.com/stats" - not relevant 
 #FASTAPI_URL = "http://192.168.7.100:8000/stats" - for college testing, not relevant
 #FASTAPI_URL = "http://host.docker.internal:8000/stats" - just for testing on windows, not relevant
-#FASTAPI_URL= "http://genai-api:8000/stats" - not relevant
+FASTAPI_URL= "http://genai-api:8000/stats" 
 #FASTAPI_URL = "http://genai-api-container:8000/stats" - not relevant
-FASTAPI_URL = "http://172.17.0.1:8000/stats"
+#FASTAPI_URL = "http://172.17.0.1:8000/stats"
 
 
 @app.route('/')
@@ -20,9 +20,9 @@ def dashboard():
     except:
 
         stats = {
-            "total_requests": "שגיאה",
-            "blocked_injections": "שגיאה",
-            "data_leaks_prevented": "שגיאה",
+            "total_requests": "error",
+            "blocked_injections": "error",
+            "data_leaks_prevented": "error",
             "status": "API Offline"
         }
         
