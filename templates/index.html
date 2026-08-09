@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GenAI Security Gateway &middot; Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
 </head>
 
 <body>
@@ -63,6 +64,80 @@
             <div class="label">Data Loss Prevention</div>
         </div>
     </main>
+
+    <section class="actions-bar">
+        <button type="button" class="btn btn-primary" id="exportBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"/>
+                <path d="M7 11l5 5 5-5"/>
+                <path d="M4 20h16"/>
+            </svg>
+            Export to Excel
+        </button>
+
+        <button type="button" class="btn btn-ghost" id="settingsBtn" disabled
+                title="Not wired up yet — no settings route exists on the backend.">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 14a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V20a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.9 18a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 3.7 7.4a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+            </svg>
+            System Settings
+        </button>
+    </section>
+
+    <section class="panel">
+        <header class="panel-head">
+            <div>
+                <h2>Live Audit Logs</h2>
+                <p class="panel-sub">Most recent gateway decisions</p>
+            </div>
+            <span class="tag tag-demo">Sample data</span>
+        </header>
+
+        <div class="table-wrap">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Timestamp</th>
+                        <th scope="col">IP / User</th>
+                        <th scope="col">Prompt Snippet</th>
+                        <th scope="col">Action Taken</th>
+                        <th scope="col">Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody id="auditBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel-head">
+            <div>
+                <h2>Recent Activity Trends</h2>
+                <p class="panel-sub">Requests vs. blocked threats over time</p>
+            </div>
+            <span class="tag tag-pending">Not wired up</span>
+        </header>
+
+        <div class="chart-frame">
+            <!-- Chart.js target. See renderActivityChart() in dashboard.js. -->
+            <canvas id="activityChart" hidden></canvas>
+            <div class="chart-empty" id="chartEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 3v18h18"/>
+                    <path d="M7 15l4-5 3 3 5-7"/>
+                </svg>
+                <p class="chart-empty-title">No time-series data yet</p>
+                <p class="chart-empty-note">
+                    The backend exposes point-in-time totals only. Add a history endpoint,
+                    load Chart.js, then call <code>renderActivityChart(data)</code>.
+                </p>
+            </div>
+        </div>
+    </section>
 
 </div>
 </body>

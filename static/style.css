@@ -208,12 +208,281 @@ body {
 .red    { --accent: var(--accent-red); }
 .orange { --accent: var(--accent-orange); }
 
+/* ---------- Quick actions ---------- */
+
+.actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 34px 0 22px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 18px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    border-radius: 10px;
+    border: 1px solid var(--border-hi);
+    background: var(--surface-hi);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease,
+                background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--border-hi);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    color: #071023;
+    border-color: transparent;
+    background: linear-gradient(140deg, #7fb4ff, var(--accent-blue));
+}
+
+.btn-primary:hover { background: linear-gradient(140deg, #97c3ff, #6ba6ff); }
+
+.btn-ghost { background: transparent; }
+.btn-ghost:hover:not(:disabled) { background: var(--surface-hi); }
+
+.btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+/* ---------- Panels ---------- */
+
+.panel {
+    margin-bottom: 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: linear-gradient(170deg, var(--surface-hi), var(--surface) 60%);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+.panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 22px 26px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-head h2 {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.panel-sub {
+    margin: 4px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.tag {
+    padding: 5px 11px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+/* Marks non-production content. Remove with the placeholder data itself. */
+.tag-demo {
+    color: var(--accent-orange);
+    background: color-mix(in srgb, var(--accent-orange) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-orange) 34%, transparent);
+}
+
+.tag-pending {
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-hi);
+}
+
+/* ---------- Audit table ---------- */
+
+.table-wrap { overflow-x: auto; }
+
+.audit-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+
+.audit-table thead th {
+    padding: 13px 26px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+}
+
+.audit-table tbody td {
+    padding: 15px 26px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.audit-table tbody tr:last-child td { border-bottom: none; }
+
+.audit-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.audit-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+.col-time {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.col-source {
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.col-snippet {
+    max-width: 340px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.badge-ok {
+    color: var(--accent-green);
+    background: color-mix(in srgb, var(--accent-green) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-green) 34%, transparent);
+}
+
+.badge-warn {
+    color: var(--accent-orange);
+    background: color-mix(in srgb, var(--accent-orange) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-orange) 34%, transparent);
+}
+
+.badge-danger {
+    color: var(--accent-red);
+    background: color-mix(in srgb, var(--accent-red) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-red) 34%, transparent);
+}
+
+.badge-neutral {
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-hi);
+}
+
+/* ---------- Activity trends ---------- */
+
+.chart-frame {
+    position: relative;
+    min-height: 280px;
+    padding: 26px;
+}
+
+.chart-frame canvas {
+    width: 100%;
+    height: 280px;
+}
+
+.chart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 228px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px dashed var(--border-hi);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.chart-empty svg {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.chart-empty-title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.chart-empty-note {
+    margin: 0;
+    max-width: 420px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.chart-empty-note code {
+    padding: 2px 6px;
+    font-size: 0.76rem;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--accent-blue);
+}
+
 /* ---------- Responsive / motion ---------- */
 
 @media (max-width: 560px) {
     body { padding: 32px 16px 48px; }
     .masthead { margin-bottom: 30px; }
     .brand-text h1 { font-size: 1.32rem; }
+    .panel-head { padding: 18px; }
+    .audit-table thead th,
+    .audit-table tbody td { padding-left: 18px; padding-right: 18px; }
+    .chart-frame { padding: 18px; }
+    .btn { flex: 1 1 auto; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -222,4 +491,5 @@ body {
         transition: none !important;
     }
     .card:hover { transform: none; }
+    .btn:hover:not(:disabled) { transform: none; }
 }
