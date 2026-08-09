@@ -1,4 +1,4 @@
-# 🖥️ GenAI Security Gateway - SOC Dashboard
+# 🖥️ GenAI Security Gateway - Systems & Monitoring Infrastructure
 
 The official monitoring and management dashboard for the GenAI Security Gateway ecosystem. Designed with a modern, dark-themed SOC (Security Operations Center) console interface to provide real-time visibility over AI threat mitigation.
 
@@ -23,7 +23,7 @@ The official monitoring and management dashboard for the GenAI Security Gateway 
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/nir968/genAI-security-web.git](https://github.com/nir968/genAI-security-web.git)
+   git clone https://github.com/nir968/genAI-security-web.git
    cd genAI-security-web
    ```
 
