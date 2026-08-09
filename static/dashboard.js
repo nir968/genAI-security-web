@@ -187,4 +187,15 @@ document.addEventListener('DOMContentLoaded', function () {
             exportToExcel(SAMPLE_AUDIT_LOGS);
         });
     }
+    
+    var sampleChartData = [
+        { label: '10:00', requests: 12, blocked: 2 },
+        { label: '11:00', requests: 19, blocked: 3 },
+        { label: '12:00', requests: 3, blocked: 1 },
+        { label: '13:00', requests: 5, blocked: 0 },
+        { label: '14:00', requests: 2, blocked: 0 },
+        { label: '15:00', requests: 3, blocked: 1 }
+    ];
+    renderActivityChart(sampleChartData);
+
 });
