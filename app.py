@@ -4,21 +4,21 @@ import requests
 
 app = Flask(__name__)
 
-#FASTAPI_URL = "https://genai-security-api.onrender.com/stats" - not relevant 
-#FASTAPI_URL = "http://192.168.7.100:8000/stats" - for college testing, not relevant
-#FASTAPI_URL = "http://host.docker.internal:8000/stats" - just for testing on windows, not relevant
-#FASTAPI_URL= "http://genai-api:8000/stats" 
+# Active endpoint for the backend API running within the Docker network
 FASTAPI_URL = "http://genai-api-container:8000/stats"
-#FASTAPI_URL = "http://172.17.0.1:8000/stats"
-
 
 @app.route('/')
 def dashboard():
+    """
+    Renders the main security dashboard.
+    Fetches real-time statistics from the backend API,
+    and falls back to an offline state if the service is unreachable.
+    """
     try:
         response = requests.get(FASTAPI_URL)
         stats = response.json() 
     except:
-
+        # Fallback dictionary for degraded/offline state presentation
         stats = {
             "total_requests": "error",
             "blocked_injections": "error",
