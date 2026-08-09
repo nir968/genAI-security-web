@@ -110,7 +110,7 @@ function toCsv(rows) {
         ].map(escape).join(','));
     });
 
-    return '﻿' + lines.join('\r\n');
+    return '\ufeff' + lines.join('\r\n');
 }
 
 function exportToExcel(rows) {
