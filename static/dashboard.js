@@ -43,9 +43,24 @@ var SAMPLE_AUDIT_LOGS = [
 var ACTION_TONE = { Passed: 'ok', Blocked: 'danger' };
 var RISK_TONE = { Low: 'ok', Medium: 'warn', High: 'danger' };
 
+function pad2(value) {
+    return String(value).padStart(2, '0');
+}
+
+/* Explicit 24-hour formatting in local time. toLocaleTimeString() was picking
+ * the runtime locale's convention, which yields "05:27:38 PM" under en-US.
+ * Building the string by hand avoids both that and the h24 locales that
+ * render midnight as "24:00". */
+function formatClock(date) {
+    return pad2(date.getHours()) + ':' + pad2(date.getMinutes());
+}
+
+function formatClockSeconds(date) {
+    return formatClock(date) + ':' + pad2(date.getSeconds());
+}
+
 function formatTimestamp(minutesAgo) {
-    var d = new Date(Date.now() - minutesAgo * 60000);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return formatClockSeconds(new Date(Date.now() - minutesAgo * 60000));
 }
 
 function makeBadge(text, tone) {
@@ -128,8 +143,180 @@ function exportToExcel(rows) {
     URL.revokeObjectURL(url);
 }
 
-/* Placeholder hook. Load Chart.js and hand this an array of
- * { label, requests, blocked } points to swap the empty state for a chart. */
+/* ------------------------------------------------------------------
+ * Activity trends
+ *
+ * Every label below is derived from a real timestamp in the API payload.
+ * Nothing here invents an hour, and no bucket exists unless the data
+ * covers it — if the endpoint returns nothing, the empty state stays up.
+ * ------------------------------------------------------------------ */
+
+/* Same-origin: the browser cannot resolve the Docker-internal hostname the
+ * server-side call uses, so this needs a Flask route that proxies the
+ * gateway. No such route exists yet — the fetch 404s until one is added. */
+var ACTIVITY_ENDPOINT = '/api/activity';
+var BUCKET_MINUTES = 60;
+
+var activityChartInstance = null;
+
+/* Accepts ISO-8601 strings, epoch seconds, or epoch milliseconds. */
+function toDate(value) {
+    if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'number') {
+        /* Anything below ~1973 in ms is far likelier to be epoch seconds. */
+        var ms = value < 1e11 ? value * 1000 : value;
+        var fromNumber = new Date(ms);
+        return isNaN(fromNumber.getTime()) ? null : fromNumber;
+    }
+
+    if (typeof value === 'string') {
+        var parsed = new Date(value);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    return null;
+}
+
+function readTimestamp(record) {
+    return toDate(record.timestamp || record.time || record.created_at || record.ts);
+}
+
+function isBlockedRecord(record) {
+    if (typeof record.blocked === 'boolean') { return record.blocked; }
+    if (typeof record.action === 'string') {
+        return record.action.trim().toLowerCase() === 'blocked';
+    }
+    return false;
+}
+
+/* Floors in local time rather than on the epoch, so buckets line up with the
+ * wall clock in zones with sub-hour UTC offsets (e.g. UTC+05:30). */
+function floorToBucket(date, bucketMinutes) {
+    var floored = new Date(date.getTime());
+    floored.setSeconds(0, 0);
+    floored.setMinutes(Math.floor(floored.getMinutes() / bucketMinutes) * bucketMinutes);
+    return floored;
+}
+
+/* Groups raw per-request records into time buckets spanning only the range
+ * the data actually covers. Interior gaps are filled with zeroes because a
+ * bucket with no records genuinely saw no traffic — that is measured, not
+ * assumed. The span never extends past the newest or oldest real record. */
+function bucketActivity(records, bucketMinutes) {
+    var counts = {};
+    var earliest = null;
+    var latest = null;
+
+    records.forEach(function (record) {
+        var stamp = readTimestamp(record);
+        if (!stamp) { return; }
+
+        var bucket = floorToBucket(stamp, bucketMinutes);
+        var key = bucket.getTime();
+
+        if (!counts[key]) { counts[key] = { requests: 0, blocked: 0 }; }
+        counts[key].requests += 1;
+        if (isBlockedRecord(record)) { counts[key].blocked += 1; }
+
+        if (earliest === null || key < earliest) { earliest = key; }
+        if (latest === null || key > latest) { latest = key; }
+    });
+
+    if (earliest === null) { return []; }
+
+    var series = [];
+    var step = bucketMinutes * 60000;
+
+    for (var key = earliest; key <= latest; key += step) {
+        var slot = counts[key] || { requests: 0, blocked: 0 };
+        series.push({
+            label: formatClock(new Date(key)),
+            requests: slot.requests,
+            blocked: slot.blocked
+        });
+    }
+
+    return series;
+}
+
+/* Handles both payload shapes: a pre-aggregated series from the backend, or
+ * raw records this bucket client-side. Pre-aggregated data is passed through
+ * without gap-filling — only the source knows whether a gap means zero. */
+function buildSeries(payload) {
+    var records = payload;
+
+    if (payload && !Array.isArray(payload)) {
+        records = payload.data || payload.records || payload.results || payload.items;
+    }
+
+    if (!Array.isArray(records) || !records.length) { return []; }
+
+    var preAggregated = typeof records[0].requests === 'number';
+
+    if (!preAggregated) {
+        return bucketActivity(records, BUCKET_MINUTES);
+    }
+
+    return records
+        .map(function (point) {
+            return { point: point, at: readTimestamp(point) };
+        })
+        .filter(function (entry) { return entry.at !== null; })
+        .sort(function (a, b) { return a.at - b.at; })
+        .map(function (entry) {
+            return {
+                label: formatClock(entry.at),
+                requests: Number(entry.point.requests) || 0,
+                blocked: Number(entry.point.blocked || entry.point.blocked_threats) || 0
+            };
+        });
+}
+
+function setChartMessage(title, note) {
+    var titleEl = document.querySelector('#chartEmpty .chart-empty-title');
+    var noteEl = document.querySelector('#chartEmpty .chart-empty-note');
+    if (titleEl) { titleEl.textContent = title; }
+    if (noteEl) { noteEl.textContent = note; }
+}
+
+function fetchActivitySeries() {
+    return fetch(ACTIVITY_ENDPOINT, { headers: { Accept: 'application/json' } })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Activity endpoint returned HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(buildSeries);
+}
+
+function loadActivityChart() {
+    if (typeof Chart === 'undefined') {
+        setChartMessage('Chart library unavailable',
+            'Chart.js failed to load, so the activity graph cannot be drawn.');
+        return;
+    }
+
+    fetchActivitySeries()
+        .then(function (series) {
+            if (!series.length) {
+                setChartMessage('No activity recorded yet',
+                    'The gateway has not logged any requests in the available history.');
+                return;
+            }
+            renderActivityChart(series);
+        })
+        .catch(function (error) {
+            setChartMessage('Activity history unavailable',
+                'Could not load ' + ACTIVITY_ENDPOINT + ' — ' + error.message +
+                '. The chart stays empty rather than showing invented figures.');
+        });
+}
+
+/* Draws the chart from { label, requests, blocked } points. */
 function renderActivityChart(series) {
     var canvas = document.getElementById('activityChart');
     var empty = document.getElementById('chartEmpty');
@@ -141,7 +328,9 @@ function renderActivityChart(series) {
     canvas.hidden = false;
     if (empty) { empty.hidden = true; }
 
-    new Chart(canvas.getContext('2d'), {
+    if (activityChartInstance) { activityChartInstance.destroy(); }
+
+    activityChartInstance = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: {
             labels: series.map(function (p) { return p.label; }),
@@ -170,7 +359,12 @@ function renderActivityChart(series) {
             plugins: { legend: { labels: { color: '#8b97ad', boxWidth: 12 } } },
             scales: {
                 x: { ticks: { color: '#8b97ad' }, grid: { color: 'rgba(255,255,255,0.06)' } },
-                y: { ticks: { color: '#8b97ad' }, grid: { color: 'rgba(255,255,255,0.06)' } }
+                y: {
+                    beginAtZero: true,
+                    /* Counts are whole requests — no fractional gridlines. */
+                    ticks: { color: '#8b97ad', precision: 0 },
+                    grid: { color: 'rgba(255,255,255,0.06)' }
+                }
             }
         }
     });
@@ -187,15 +381,6 @@ document.addEventListener('DOMContentLoaded', function () {
             exportToExcel(SAMPLE_AUDIT_LOGS);
         });
     }
-    
-    var sampleChartData = [
-        { label: '10:00', requests: 12, blocked: 2 },
-        { label: '11:00', requests: 19, blocked: 3 },
-        { label: '12:00', requests: 3, blocked: 1 },
-        { label: '13:00', requests: 5, blocked: 0 },
-        { label: '14:00', requests: 2, blocked: 0 },
-        { label: '15:00', requests: 3, blocked: 1 }
-    ];
-    renderActivityChart(sampleChartData);
 
+    loadActivityChart();
 });
