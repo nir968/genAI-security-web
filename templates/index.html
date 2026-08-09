@@ -1,29 +1,69 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>LLM Security Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GenAI Security Gateway &middot; Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <h1>🛡️ GenAI Security Gateway</h1>
-    <p class="subtitle">Admin Dashboard</p>
-    
-    <div>
+{% set offline = stats.total_requests == 'error' %}
+<div class="shell">
+
+    <header class="masthead">
+        <div class="brand">
+            <span class="brand-mark" aria-hidden="true">&#128737;</span>
+            <div class="brand-text">
+                <h1>GenAI Security Gateway</h1>
+                <p class="subtitle">Admin Dashboard</p>
+            </div>
+        </div>
+
+        <span class="status {{ 'is-offline' if offline else 'is-online' }}">
+            <span class="status-dot" aria-hidden="true"></span>
+            {{ stats.status if stats.status else 'Operational' }}
+        </span>
+    </header>
+
+    <main class="grid">
         <div class="card blue">
-            <div class="stat">{{ stats.total_requests }}</div>
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12h4l3 8 4-16 3 8h4"/>
+                </svg>
+            </div>
+            <div class="stat {{ 'is-error' if offline else '' }}">{{ stats.total_requests }}</div>
             <div class="label">Total Requests</div>
         </div>
+
         <div class="card red">
-            <div class="stat">{{ stats.blocked_injections }}</div>
-            <div class="label">Prompt Injections blocked</div>
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 3v6c0 4.2-2.8 7.6-7 9-4.2-1.4-7-4.8-7-9V6z"/>
+                    <path d="M9.5 9.5l5 5m0-5l-5 5"/>
+                </svg>
+            </div>
+            <div class="stat {{ 'is-error' if offline else '' }}">{{ stats.blocked_injections }}</div>
+            <div class="label">Prompt Injections Blocked</div>
         </div>
+
         <div class="card orange">
-            <div class="stat">{{ stats.data_leaks_prevented }}</div>
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="10" width="16" height="10" rx="2"/>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                    <path d="M12 14v2"/>
+                </svg>
+            </div>
+            <div class="stat {{ 'is-error' if offline else '' }}">{{ stats.data_leaks_prevented }}</div>
             <div class="label">Data Loss Prevention</div>
         </div>
-    </div>
+    </main>
+
+</div>
 </body>
 </html>
-
