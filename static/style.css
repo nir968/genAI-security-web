@@ -311,13 +311,6 @@ body {
     white-space: nowrap;
 }
 
-/* Marks non-production content. Remove with the placeholder data itself. */
-.tag-demo {
-    color: var(--accent-orange);
-    background: color-mix(in srgb, var(--accent-orange) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--accent-orange) 34%, transparent);
-}
-
 .tag-pending {
     color: var(--text-muted);
     background: rgba(255, 255, 255, 0.04);
@@ -367,18 +360,24 @@ body {
     white-space: nowrap;
 }
 
-.col-source {
-    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
-    font-size: 0.8rem;
-    white-space: nowrap;
-}
-
 .col-snippet {
-    max-width: 340px;
+    max-width: 380px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-muted);
+}
+
+.col-threat {
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.table-empty {
+    padding: 34px 26px !important;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
 .badge {
